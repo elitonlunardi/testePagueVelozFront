@@ -33,24 +33,6 @@ export default class Empresa extends Component {
 
   handleSubmitEmpresa = e => {
     e.preventDefault();
-    const { empresas, novaEmpresa } = this.state;
-    api.post("Empresa", novaEmpresa).then(data => {
-      if (data.status == 200) {
-        swal("Sucesso!", "Empresa cadastrada com sucesso!", "success");
-      } else {
-        swal("Ooops :(", "Falha ao cadastrar empresa.", "error");
-      }
-      this.setState({
-        empresas: [...empresas, novaEmpresa]
-      });
-      novaEmpresa.nomeFantasia = "";
-      novaEmpresa.cnpj = "";
-      novaEmpresa.uf = "";
-    });
-  };
-
-  handleClickBtnFornecedores = e => {
-    
   };
 
   render() {
@@ -72,7 +54,28 @@ export default class Empresa extends Component {
                   <Card.Title>Cadastro de empresas</Card.Title>
                   <Formik
                     validationSchema={schema}
-                    onSubmit={console.log}
+                    onSubmit={data => {
+                      api.post("Empresa", data).then(data => {
+                        if (data.status == 200) {
+                          swal(
+                            "Sucesso!",
+                            "Empresa cadastrada com sucesso!",
+                            "success"
+                          );
+                        } else {
+                          swal(
+                            "Ooops :(",
+                            "Falha ao cadastrar empresa.",
+                            "error"
+                          );
+                        }
+                        api.get(`Empresa`).then(response => {
+                          this.setState({
+                            empresas: response.data.data
+                          });
+                        });
+                      });
+                    }}
                     initialValues={{
                       nomeFantasia: "",
                       cnpj: "",
