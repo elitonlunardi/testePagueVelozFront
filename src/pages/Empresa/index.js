@@ -55,26 +55,37 @@ export default class Empresa extends Component {
                   <Formik
                     validationSchema={schema}
                     onSubmit={data => {
-                      api.post("Empresa", data).then(data => {
-                        if (data.status == 200) {
-                          swal(
-                            "Sucesso!",
-                            "Empresa cadastrada com sucesso!",
-                            "success"
-                          );
-                        } else {
+                      api
+                        .post("Empresa", data)
+                        .then(data => {
+                          console.log(data);
+                          if (data.status == 200) {
+                            swal(
+                              "Sucesso!",
+                              "Empresa cadastrada com sucesso!",
+                              "success"
+                            );
+                          } else {
+                            swal(
+                              "Ooops :(",
+                              "Falha ao cadastrar empresa.",
+                              "error"
+                            );
+                          }
+                          api.get(`Empresa`).then(response => {
+                            this.setState({
+                              empresas: response.data.data
+                            });
+                          });
+                        })
+                        .catch(error => {
+                          console.log(error.response);
                           swal(
                             "Ooops :(",
-                            "Falha ao cadastrar empresa.",
+                            `${error.response.data.errors}`,
                             "error"
                           );
-                        }
-                        api.get(`Empresa`).then(response => {
-                          this.setState({
-                            empresas: response.data.data
-                          });
                         });
-                      });
                     }}
                     initialValues={{
                       nomeFantasia: "",
