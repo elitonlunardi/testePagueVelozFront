@@ -50,7 +50,7 @@ export default class Empresa extends Component {
   };
 
   handleClickBtnFornecedores = e => {
-    console.log("click btn forn");
+    
   };
 
   render() {
