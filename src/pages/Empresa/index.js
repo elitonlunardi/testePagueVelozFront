@@ -58,7 +58,6 @@ export default class Empresa extends Component {
                       api
                         .post("Empresa", data)
                         .then(data => {
-                          console.log(data);
                           if (data.status == 200) {
                             swal(
                               "Sucesso!",
