@@ -45,11 +45,7 @@ export default class Fornecedor extends Component {
     this.setState(prevState => ({
       fornecedores: response.data.data,
       acessandoApi: false,
-      idEmpresa: idEmpresa,
-      novoFornecedor: {
-        ...prevState.novoFornecedor,
-        idEmpresa: idEmpresa
-      }
+      idEmpresa: idEmpresa
     }));
   }
 
