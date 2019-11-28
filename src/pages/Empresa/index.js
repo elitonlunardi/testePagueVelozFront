@@ -214,7 +214,9 @@ export default class Empresa extends Component {
                   <td>{emp.uf}</td>
                   <td>
                     <Link to={`/fornecedores/${encodeURIComponent(emp.id)}`}>
-                      Fornecedores
+                      <Button type="button" variant="outline-warning" size="sm">
+                        Fornecedores
+                      </Button>
                     </Link>
                   </td>
                 </tr>

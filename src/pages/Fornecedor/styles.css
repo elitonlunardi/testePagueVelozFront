@@ -1,3 +1,10 @@
+.textFornecedor {
+  margin-top: 20px;
+  text-align: center;
+  color: rgb(101, 137, 253);
+  font-weight: bold;
+}
+
 .btnVincularFornecedor {
   margin-top: 8px;
   margin-bottom: -40px;
