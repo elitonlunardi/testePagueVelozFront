@@ -64,45 +64,12 @@ export default class Fornecedor extends Component {
   render() {
     const { modalShow, fornecedores, acessandoApi, idEmpresa } = this.state;
     const schema = yup.object({
-      nome: yup.string().required(),
-      documento: yup.string().required(),
-      rg: yup.string().required(),
-      dataNascimento: yup.string().required(),
-      telefone: yup.string().required()
+      nome: yup.string().required("Nome é obrigatório"),
+      documento: yup.string().required("Documento é obrigatório"),
+      rg: yup.string().required("Rg é obrigatório"),
+      dataNascimento: yup.string().required("Data de nascimento é obrigatório"),
+      telefone: yup.string().required("Telefone é obrigatório")
     });
-
-    function teste(values, setValues) {
-      if (values.documento != "") {
-        console.log(values.documento);
-        var v = values.documento;
-        v.replace(/[^0-9.]+/g, "");
-        console.log(v);
-        values.documento = v;
-        console.log(values.documento);
-        setValues(values);
-      }
-
-      // if (values.documento >= 14) {
-      //   let v = values.documento;
-      //   if (v.length === 10 || v.length === 14) {
-      //     v = v.replace(/[^\d]+/g, "");
-      //     //CPF
-      //     v = v.replace(/(\d{3})(\d)/, "$1.$2");
-      //     v = v.replace(/(\d{3})(\d)/, "$1.$2");
-      //     v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-      //     values.documento = v;
-      //     setValues(values);
-      //   } else if (v.length > 14) {
-      //     //CNPJ
-      //     v = v.replace(/^(\d{2})(\d)/, "$1.$2");
-      //     v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-      //     v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
-      //     v = v.replace(/(\d{4})(\d)/, "$1-$2");
-      //     values.documento = v;
-      //     setValues(values);
-      //   }
-      // }
-    }
 
     if (acessandoApi) {
       return <h1>Carregando...</h1>;
@@ -228,7 +195,7 @@ export default class Fornecedor extends Component {
                     <Form.Group controlId="formGroupdataDocumento">
                       <Form.Label>CNPJ/CPF</Form.Label>
                       <Form.Control
-                        type="number"
+                        type="tel"
                         placeholder="CNPJ/CPF"
                         name="documento"
                         onChange={e => {
