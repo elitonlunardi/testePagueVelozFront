@@ -62,43 +62,37 @@ export default class Fornecedor extends Component {
     });
   };
 
-  validarPessoaFisica(values) {
+  validarPessoaFisica(e) {
     console.log("entrou validação");
-    console.log(values.documento);
-    console.log(values.documento.length);
-    if (values.documento.length == 10) {
+    console.log(e.target.value);
+    console.log(e.target.value.length);
+    if (e.target.value.length == 10) {
       this.setState({
         ehPessoaJuridica: false
       });
-    } else if (values.documento.length == 13) {
+    } else if (e.target.value.length == 14) {
       console.log("juridica");
       //87236945000195
       this.setState({
         ehPessoaJuridica: true
       });
+    } else {
+      this.setState({
+        ehPessoaJuridica: false
+      });
     }
   }
 
   render() {
-    const {
-      modalShow,
-      fornecedores,
-      acessandoApi,
-      idEmpresa,
-      ehPessoaJuridica
-    } = this.state;
+    const { modalShow, fornecedores, acessandoApi, idEmpresa } = this.state;
 
     const schema = yup.object({
       ehPessoaJuridica: yup.boolean(),
       nome: yup.string().required("Nome é obrigatório"),
       documento: yup.string().required("Documento é obrigatório"),
       telefone: yup.string().required("Telefone é obrigatório"),
-      rg: yup.string().when("ehPessoaJuridica", {
-        is: value => value === true,
-        then: yup.string().max(5, "Rg é obrigatório"),
-        otherwise: yup.string().min(0, "a")
-      }),
-      dataNascimento: yup.string().required("Data de nascimento é obrigatória")
+      rg: yup.string().max(12, "Rg pode ter no máximo 12 caractéres"),
+      dataNascimento: yup.string()
     });
 
     if (acessandoApi) {
@@ -151,6 +145,7 @@ export default class Fornecedor extends Component {
                 <Formik
                   validationSchema={schema}
                   onSubmit={data => {
+                    console.log(data);
                     data.idEmpresa = idEmpresa;
                     api
                       .post(`Empresa/vincular-fornecedor`, data)
@@ -192,7 +187,7 @@ export default class Fornecedor extends Component {
                     nome: "",
                     documento: "",
                     rg: "",
-                    dataNascimento: "",
+                    dataNascimento: undefined,
                     telefone: ""
                   }}
                 >
@@ -207,7 +202,7 @@ export default class Fornecedor extends Component {
                     setValues
                   }) => (
                     <Form noValidate onSubmit={handleSubmit}>
-                      {this.state.ehPessoaJuridica === true ? (
+                      {this.state.ehPessoaJuridica === false ? (
                         <>
                           <Form.Group controlId="formGroupNome">
                             <Form.Label>Nome</Form.Label>
@@ -226,11 +221,11 @@ export default class Fornecedor extends Component {
                           <Form.Group controlId="formGroupdataDocumento">
                             <Form.Label>CNPJ/CPF</Form.Label>
                             <Form.Control
-                              type="tel"
+                              type="number"
                               placeholder="CNPJ/CPF"
                               name="documento"
                               onChange={handleChange}
-                              onKeyUp={this.validarPessoaFisica(values)}
+                              onKeyUp={e => this.validarPessoaFisica(e)}
                               value={values.documento}
                               isInvalid={!!errors.documento}
                             />
@@ -305,12 +300,12 @@ export default class Fornecedor extends Component {
                           <Form.Group controlId="formGroupdataDocumento">
                             <Form.Label>CNPJ/CPF</Form.Label>
                             <Form.Control
-                              type="tel"
+                              type="number"
                               placeholder="CNPJ/CPF"
                               name="documento"
                               onChange={e => {
                                 handleChange(e);
-                                this.validarPessoaFisica(values);
+                                this.validarPessoaFisica(e);
                               }}
                               value={values.documento}
                               isInvalid={!!errors.documento}
@@ -336,12 +331,6 @@ export default class Fornecedor extends Component {
                           <Button type="submit">Vincular</Button>
                         </>
                       )}
-                      <Button
-                        type="button"
-                        onClick={e => this.teste(values, setValues)}
-                      >
-                        Mudar state
-                      </Button>
                     </Form>
                   )}
                 </Formik>
