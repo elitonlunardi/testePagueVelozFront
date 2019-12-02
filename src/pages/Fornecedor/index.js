@@ -32,11 +32,14 @@ export default class Fornecedor extends Component {
     super(props);
     this.state = {
       fornecedores: [],
+      telefonesFornecedor: [],
       ehPessoaJuridica: false,
-      idEmpresa: "",
-      modalShow: false,
-      modalSetShow: false,
-      acessandoApi: true
+      modalShowAddForn: false,
+      modalSetShowAddForn: false,
+      modalShowAddTele: false,
+      modalSetShowAddTele: false,
+      acessandoApi: true,
+      idEmpresa: ""
     };
   }
 
@@ -51,28 +54,40 @@ export default class Fornecedor extends Component {
     }));
   }
 
-  handleClose = () => {
+  handleShowAddForn = () => {
     this.setState({
-      modalShow: false
+      modalShowAddForn: true
     });
   };
-  handleShow = () => {
+  handleCloseAddForn = () => {
     this.setState({
-      modalShow: true
+      modalShowAddForn: false
+    });
+  };
+
+  handleShowAddTele = async idFornecedorAdicionandoTelefone => {
+    const { data } = await api.get(
+      `Fornecedor/obter-telefones?idFornecedor=${idFornecedorAdicionandoTelefone}`
+    );
+    console.log(data);
+    this.setState({
+      telefonesFornecedor: data.data,
+      modalShowAddTele: true
+    });
+  };
+
+  handleCloseAddTele = () => {
+    this.setState({
+      modalShowAddTele: false
     });
   };
 
   validarPessoaFisica(e) {
-    console.log("entrou validação");
-    console.log(e.target.value);
-    console.log(e.target.value.length);
     if (e.target.value.length == 10) {
       this.setState({
         ehPessoaJuridica: false
       });
     } else if (e.target.value.length == 14) {
-      console.log("juridica");
-      //87236945000195
       this.setState({
         ehPessoaJuridica: true
       });
@@ -84,7 +99,13 @@ export default class Fornecedor extends Component {
   }
 
   render() {
-    const { modalShow, fornecedores, acessandoApi, idEmpresa } = this.state;
+    const {
+      modalShowAddForn,
+      modalShowAddTele,
+      fornecedores,
+      acessandoApi,
+      idEmpresa
+    } = this.state;
 
     const schema = yup.object({
       ehPessoaJuridica: yup.boolean(),
@@ -110,7 +131,7 @@ export default class Fornecedor extends Component {
                     <Button
                       className="btnVincularFornecedor"
                       variant="outline-success"
-                      onClick={this.handleShow}
+                      onClick={this.handleShowAddForn}
                     >
                       Vincular
                     </Button>
@@ -120,6 +141,7 @@ export default class Fornecedor extends Component {
                           <th>Documento</th>
                           <th>Nome</th>
                           <th>Data de Cadastro</th>
+                          <th></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -128,6 +150,14 @@ export default class Fornecedor extends Component {
                             <td>{forn.documento}</td>
                             <td>{forn.nome}</td>
                             <td>{forn.dataCadastro}</td>
+                            <td>
+                              <Button
+                                type="button"
+                                onClick={e => this.handleShowAddTele(forn.id)}
+                              >
+                                Adicionar telefone
+                              </Button>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -137,7 +167,7 @@ export default class Fornecedor extends Component {
               </Col>
             </Row>
 
-            <Modal show={modalShow} onHide={this.handleClose}>
+            <Modal show={modalShowAddForn} onHide={this.handleCloseAddForn}>
               <Modal.Header closeButton>
                 <Modal.Title>Vincular fornecedor</Modal.Title>
               </Modal.Header>
@@ -145,7 +175,6 @@ export default class Fornecedor extends Component {
                 <Formik
                   validationSchema={schema}
                   onSubmit={data => {
-                    console.log(data);
                     data.idEmpresa = idEmpresa;
                     api
                       .post(`Empresa/vincular-fornecedor`, data)
@@ -164,7 +193,7 @@ export default class Fornecedor extends Component {
                               });
                             });
 
-                          this.handleClose();
+                          this.handleCloseAddForn();
                         } else {
                           swal(
                             "Ooops :(",
@@ -334,6 +363,34 @@ export default class Fornecedor extends Component {
                     </Form>
                   )}
                 </Formik>
+              </Modal.Body>
+              <Modal.Footer></Modal.Footer>
+            </Modal>
+
+            <Modal
+              size="lg"
+              show={modalShowAddTele}
+              onHide={this.handleCloseAddTele}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Telefones do fornecedor</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Table>
+                  <thead>
+                    <tr>
+                      <th>Numero</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {this.state.telefonesFornecedor.map(tel => (
+                      <tr>
+                        {/* key={tel.id} */}
+                        <td>{tel.telefone}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
               </Modal.Body>
               <Modal.Footer></Modal.Footer>
             </Modal>

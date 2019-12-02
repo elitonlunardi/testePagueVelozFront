@@ -36,12 +36,12 @@ export default class Empresa extends Component {
   };
 
   render() {
-    const schema = yup.object({
-      nomeFantasia: yup.string().required(),
-      cnpj: yup.string().required(),
-      uf: yup.string().required()
-    });
     const { empresas } = this.state;
+    const schema = yup.object({
+      nomeFantasia: yup.string().required("Nome fantasia é obrigatório"),
+      cnpj: yup.string().required("Cnpj é obrigatório"),
+      uf: yup.string().required("Uf é obrigatório")
+    });
     return (
       <>
         <NavbarComponent></NavbarComponent>
@@ -106,7 +106,7 @@ export default class Empresa extends Component {
                           <Form.Group
                             as={Col}
                             md="12"
-                            controlId="validationFormik01"
+                            controlId="formGroupNomeFantasia"
                           >
                             <Form.Label>Nome Fantasia</Form.Label>
                             <Form.Control
@@ -118,13 +118,13 @@ export default class Empresa extends Component {
                               isInvalid={!!errors.nomeFantasia}
                             />
                             <Form.Control.Feedback type="invalid">
-                              {errors.nomeFanstasia}
+                              {errors.nomeFantasia}
                             </Form.Control.Feedback>
                           </Form.Group>
                           <Form.Group
                             as={Col}
                             md="12"
-                            controlId="validationFormik02"
+                            controlId="formGroupCnpj"
                           >
                             <Form.Label>CNPJ</Form.Label>
                             <Form.Control
@@ -141,11 +141,7 @@ export default class Empresa extends Component {
                           </Form.Group>
                         </Form.Row>
                         <Form.Row>
-                          <Form.Group
-                            as={Col}
-                            md="12"
-                            controlId="validationFormik03"
-                          >
+                          <Form.Group as={Col} md="12" controlId="formGroupUf">
                             <Form.Label>Unidade federativa</Form.Label>
                             <Form.Control
                               as="select"
@@ -197,32 +193,42 @@ export default class Empresa extends Component {
             </Col>
           </Row>
 
-          <Table striped hover>
-            <thead>
-              <tr>
-                <th>CNPJ</th>
-                <th>Nome Fantasia</th>
-                <th>UF</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {empresas.map(emp => (
-                <tr key={emp.id}>
-                  <td>{emp.cnpj}</td>
-                  <td>{emp.nomeFantasia}</td>
-                  <td>{emp.uf}</td>
-                  <td>
-                    <Link to={`/fornecedores/${encodeURIComponent(emp.id)}`}>
-                      <Button type="button" variant="outline-warning" size="sm">
-                        Fornecedores
-                      </Button>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <Card>
+            <Card.Body>
+              <Table striped hover>
+                <thead>
+                  <tr>
+                    <th>CNPJ</th>
+                    <th>Nome Fantasia</th>
+                    <th>UF</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {empresas.map(emp => (
+                    <tr key={emp.id}>
+                      <td>{emp.cnpj}</td>
+                      <td>{emp.nomeFantasia}</td>
+                      <td>{emp.uf}</td>
+                      <td>
+                        <Link
+                          to={`/fornecedores/${encodeURIComponent(emp.id)}`}
+                        >
+                          <Button
+                            type="button"
+                            variant="outline-warning"
+                            size="sm"
+                          >
+                            Fornecedores
+                          </Button>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Card.Body>
+          </Card>
         </Container>
       </>
     );
