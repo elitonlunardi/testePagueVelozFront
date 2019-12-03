@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from "react";
+import React, { Component } from "react";
 
 import PropTypes from "prop-types";
 
@@ -13,7 +13,7 @@ import Form from "react-bootstrap/Form";
 
 import "./styles.css";
 import * as yup from "yup";
-import { Formik, useFormikContext } from "formik";
+import { Formik } from "formik";
 
 import NavbarComponent from "../../components/Navbar";
 import swal from "sweetalert";
@@ -39,7 +39,9 @@ export default class Fornecedor extends Component {
       modalShowAddTele: false,
       modalSetShowAddTele: false,
       acessandoApi: true,
-      idEmpresa: ""
+      novoTelefone: "",
+      idEmpresa: "",
+      idFornecedorAdicionandoTelefone: ""
     };
   }
 
@@ -72,6 +74,7 @@ export default class Fornecedor extends Component {
     console.log(data);
     this.setState({
       telefonesFornecedor: data.data,
+      idFornecedorAdicionandoTelefone: idFornecedorAdicionandoTelefone,
       modalShowAddTele: true
     });
   };
@@ -80,6 +83,40 @@ export default class Fornecedor extends Component {
     this.setState({
       modalShowAddTele: false
     });
+  };
+
+  handleSubmitAddTelefone = event => {
+    event.persist();
+    event.preventDefault();
+    const {
+      idEmpresa,
+      idFornecedorAdicionandoTelefone,
+      novoTelefone
+    } = this.state;
+    console.log({
+      idEmpresa: idEmpresa,
+      idFornecedor: idFornecedorAdicionandoTelefone,
+      numero: novoTelefone
+    });
+    api
+      .post(`Fornecedor/adicionar-telefone`, {
+        idEmpresa: idEmpresa,
+        idFornecedor: idFornecedorAdicionandoTelefone,
+        numero: novoTelefone
+      })
+      .then(async response => {
+        swal("Sucesso!", "Telefone adicionado com sucesso!", "success");
+        const { data } = await api.get(
+          `Fornecedor/obter-telefones?idFornecedor=${idFornecedorAdicionandoTelefone}`
+        );
+        this.setState({
+          telefonesFornecedor: data.data,
+          novoTelefone: ""
+        });
+      })
+      .catch(error => {
+        swal("Ooops :(", `${error.response.data.errors}`, "error");
+      });
   };
 
   validarPessoaFisica(e) {
@@ -153,9 +190,10 @@ export default class Fornecedor extends Component {
                             <td>
                               <Button
                                 type="button"
+                                size="sm"
                                 onClick={e => this.handleShowAddTele(forn.id)}
                               >
-                                Adicionar telefone
+                                Telefones
                               </Button>
                             </td>
                           </tr>
@@ -216,7 +254,7 @@ export default class Fornecedor extends Component {
                     nome: "",
                     documento: "",
                     rg: "",
-                    dataNascimento: undefined,
+                    dataNascimento: "",
                     telefone: ""
                   }}
                 >
@@ -367,30 +405,44 @@ export default class Fornecedor extends Component {
               <Modal.Footer></Modal.Footer>
             </Modal>
 
-            <Modal
-              size="lg"
-              show={modalShowAddTele}
-              onHide={this.handleCloseAddTele}
-            >
+            <Modal show={modalShowAddTele} onHide={this.handleCloseAddTele}>
               <Modal.Header closeButton>
                 <Modal.Title>Telefones do fornecedor</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Numero</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <Row>
+                  <Col>
+                    <Form onSubmit={e => this.handleSubmitAddTelefone(e)}>
+                      <Form.Control
+                        type="number"
+                        className="inputAddTelefone"
+                        placeholder="Novo telefone"
+                        required
+                        onChange={e =>
+                          this.setState({
+                            novoTelefone: e.target.value
+                          })
+                        }
+                        values={this.state.novoTelefone}
+                      />
+                      <Button className="btnAddTelefone" type="submit">
+                        Adicionar telefone
+                      </Button>
+                    </Form>
+                  </Col>
+                </Row>
+                {this.state.telefonesFornecedor[0] == null ||
+                this.state.telefonesFornecedor[0].telefone == null ? (
+                  <h5 className="textAddTelefone">
+                    O fornecedor não possui telefones
+                  </h5>
+                ) : (
+                  <ul>
                     {this.state.telefonesFornecedor.map(tel => (
-                      <tr>
-                        {/* key={tel.id} */}
-                        <td>{tel.telefone}</td>
-                      </tr>
+                      <li key={tel.id}>{tel.telefone}</li>
                     ))}
-                  </tbody>
-                </Table>
+                  </ul>
+                )}
               </Modal.Body>
               <Modal.Footer></Modal.Footer>
             </Modal>
